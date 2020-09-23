@@ -57,12 +57,18 @@
       [`(lambda (,x) ,body) (closure eval-expr x body env)]
 
       ; procedure call
-      [`(,operator ,operand) (proc-call eval-expr operator operand env)]
+      [`(,operator ,operand)
+	((eval-expr operator env) (eval-expr operand env))]
 
       ; predicates
       [`(boolean? ,b) (boolean? b)]
       [`(number? ,n) (number? n)]
-      )))
+
+      ; conditionals
+      [`(if ,test-expr ,consequent-expr ,alternate-expr)
+	(if (eval-expr test-expr env)
+	  (eval-expr consequent-expr env)
+	  (eval-expr alternate-expr env))])))
 
 (define empty-env
   (lambda ()
@@ -84,9 +90,7 @@
     (lambda (arg)
       (evaluator body (env-extend var arg env)))))
 
-(define proc-call
-  (lambda (evaluator operator operand env)
-    ((evaluator operator env) (evaluator operand env))))
-
 (eval-expr '((lambda (x) x) 5)
 	   (env-extend 'y 3 (env-extend 'x 2 (empty-env))))
+
+(eval-expr '(if #f '#t '#f) (empty-env))
