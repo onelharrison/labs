@@ -7,7 +7,7 @@
     [(_ desc actual expected)
      (if (equal? actual expected)
        (displayln (format "it ~s" desc))
-       (error 'it (format "Failed! ~s" desc)))]))
+       (error 'it(format "Failed! ~s: Expected ~s, but got ~s" desc expected actual)))]))
 
 (it "evaluates a number literal to itself"
     (eval-expr '10 (empty-env))
@@ -72,3 +72,39 @@
 (it "evaluates (integer? n) where n is an integer"
     (eval-expr '(integer? 10) (empty-env))
     #t)
+
+(it "evaluates (+) to 0"
+    (eval-expr '(+) (empty-env))
+    0)
+
+(it "evaluates (+ 1) to 1"
+    (eval-expr '(+ 1) (empty-env))
+    1)
+
+(it "evaluates (+ 1 2) to 3"
+    (eval-expr '(+ 1 2) (empty-env))
+    3)
+
+(it "evaluates (+ 1 2 3) to 6"
+    (eval-expr '(+ 1 2 3) (empty-env))
+    6)
+
+(it "evaluates (*) to 1"
+    (eval-expr '(*) (empty-env))
+    1)
+
+(it "evaluates (* 0) to 0"
+    (eval-expr '(* 0) (empty-env))
+    0)
+
+(it "evaluates (* 1) to 1"
+    (eval-expr '(* 1) (empty-env))
+    1)
+
+(it "evaluates (* 1 2) to 2"
+    (eval-expr '(* 1 2) (empty-env))
+    2)
+
+(it "evaluates (* 1 2 3) to 6"
+    (eval-expr '(* 1 2 3) (empty-env))
+    6)

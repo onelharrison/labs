@@ -56,6 +56,8 @@
       [`(real? ,n) (real? n)]
       [`(rational? ,n) (rational? n)]
       [`(integer? ,n) (integer? n)]
+      [`(+ ,@(list (? number? ns)...)) (apply + ns)]
+      [`(* ,@(list (? number? ns)...)) (apply * ns)]
 
       ;; variable
       ;; --------
