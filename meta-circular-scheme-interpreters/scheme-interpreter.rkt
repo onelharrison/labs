@@ -40,31 +40,46 @@
 ; <operator> ::= <expression>
 ; <operand> ::= <expression>
 
+(provide eval-expr empty-env)
+
 (define eval-expr
   (lambda (expr env)
     (match expr
-      ; variable
-      [`,x #:when (symbol? x) (env-lookup x env)]
+      ;; built-in procedures
+      ;; -------------------
+      ; boolean procedures
+      [`(boolean? ,b) (boolean? b)]
 
-      ; literals
+      ; numerical procedures
+      [`(number? ,n) (number? n)]
+      [`(complex? ,n) (complex? n)]
+      [`(real? ,n) (real? n)]
+      [`(rational? ,n) (rational? n)]
+      [`(integer? ,n) (integer? n)]
+
+      ;; variable
+      ;; --------
+      [`,(? symbol? x) (env-lookup x env)]
+
+      ;; literals
+      ;; --------
       [`',datum `,datum]
       [`(quote ,datum) `,datum]
       ['#t #t]
       ['#f #f]
-      [`,n #:when (number? n) n]
+      [`,(? number? n) n]
 
-      ; lambda expression
-      [`(lambda (,x) ,body) (closure eval-expr x body env)]
+      ;; lambda expression
+      ;; -----------------
+      [`(lambda (,(? symbol? x)) ,body) (closure eval-expr x body env)]
 
-      ; procedure call
+      ;; procedure call
+      ;; --------------
       [`(,operator ,operand)
 	((eval-expr operator env) (eval-expr operand env))]
 
-      ; predicates
-      [`(boolean? ,b) (boolean? b)]
-      [`(number? ,n) (number? n)]
-
-      ; conditionals
+      ;; conditionals
+      ;; ------------
       [`(if ,test-expr ,consequent-expr ,alternate-expr)
 	(if (eval-expr test-expr env)
 	  (eval-expr consequent-expr env)
@@ -89,8 +104,3 @@
   (lambda (evaluator var body env)
     (lambda (arg)
       (evaluator body (env-extend var arg env)))))
-
-(eval-expr '((lambda (x) x) 5)
-	   (env-extend 'y 3 (env-extend 'x 2 (empty-env))))
-
-(eval-expr '(if #f '#t '#f) (empty-env))
