@@ -58,6 +58,16 @@
       [`(integer? ,n) (integer? n)]
       [`(+ ,@(list (? number? ns)...)) (apply + ns)]
       [`(* ,@(list (? number? ns)...)) (apply * ns)]
+      [`(- ,n1 ,@(list (? number? n-rest)...)) (apply - (cons n1 n-rest))]
+      [`(/ ,n1 ,@(list (? number? n-rest)...)) (apply / (cons n1 n-rest))]
+      [`(> ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply > (cons n1 (cons n2 n-rest)))]
+      [`(>= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply >= (cons n1 (cons n2 n-rest)))]
+      [`(< ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply < (cons n1 (cons n2 n-rest)))]
+      [`(<= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply <= (cons n1 (cons n2 n-rest)))]
+      [`(= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply = (cons n1 (cons n2 n-rest)))]
+      [`(quotient ,n1 ,n2) (quotient n1 n2)]
+      [`(remainder ,n1 ,n2) (remainder n1 n2)]
+      [`(modulo ,n1 ,n2) (modulo n1 n2)]
 
       ;; variable
       ;; --------

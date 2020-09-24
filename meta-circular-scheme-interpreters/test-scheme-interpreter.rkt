@@ -108,3 +108,63 @@
 (it "evaluates (* 1 2 3) to 6"
     (eval-expr '(* 1 2 3) (empty-env))
     6)
+
+(it "evaluates (- 1) to -1"
+    (eval-expr '(- 1) (empty-env))
+    -1)
+
+(it "evaluates (- 3 2) to 1"
+    (eval-expr '(- 3 2) (empty-env))
+    1)
+
+(it "evalutes (> 3 2) to #t"
+    (eval-expr '(> 3 2) (empty-env))
+    #t)
+
+(it "evalutes (> 3 2 1) to #t"
+    (eval-expr '(> 3 2 1) (empty-env))
+    #t)
+
+(it "evalutes (>= 3 2) to #t"
+    (eval-expr '(>= 3 2) (empty-env))
+    #t)
+
+(it "evalutes (>= 2 2 1) to #t"
+    (eval-expr '(>= 2 2 1) (empty-env))
+    #t)
+
+(it "evalutes (< 1 2) to #t"
+    (eval-expr '(< 1 2) (empty-env))
+    #t)
+
+(it "evalutes (< 1 2 3) to #t"
+    (eval-expr '(< 1 2 3) (empty-env))
+    #t)
+
+(it "evalutes (<= 1 2) to #t"
+    (eval-expr '(<= 1 2) (empty-env))
+    #t)
+
+(it "evalutes (<= 1 2 2) to #t"
+    (eval-expr '(<= 1 2 2) (empty-env))
+    #t)
+
+(it "evalutes (= 2 2) to #t"
+    (eval-expr '(= 2 2) (empty-env))
+    #t)
+
+(it "evalutes (= 2 2 2) to #t"
+    (eval-expr '(= 2 2 2) (empty-env))
+    #t)
+
+(it "evalutes (quotient 10 3) to 3"
+    (eval-expr '(quotient 10 3) (empty-env))
+    3)
+
+(it "evalutes (remainder 10 3) to 1"
+    (eval-expr '(remainder 10 3) (empty-env))
+    1)
+
+(it "evalutes (modulo 10 3) to 1"
+    (eval-expr '(modulo 10 3) (empty-env))
+    1)
