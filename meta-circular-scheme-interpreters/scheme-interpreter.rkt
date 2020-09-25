@@ -48,14 +48,14 @@
       ;; built-in procedures
       ;; -------------------
       ; boolean procedures
-      [`(boolean? ,b) (boolean? b)]
+      [`(boolean? ,b-expr) (boolean? (eval-expr b-expr env))]
 
       ; numerical procedures
-      [`(number? ,n) (number? n)]
-      [`(complex? ,n) (complex? n)]
-      [`(real? ,n) (real? n)]
-      [`(rational? ,n) (rational? n)]
-      [`(integer? ,n) (integer? n)]
+      [`(number? ,n-expr) (number? (eval-expr n-expr env))]
+      [`(complex? ,n-expr) (complex? (eval-expr n-expr env))]
+      [`(real? ,n-expr) (real? (eval-expr n-expr env))]
+      [`(rational? ,n-expr) (rational? (eval-expr n-expr env))]
+      [`(integer? ,n-expr) (integer? (eval-expr n-expr env))]
       [`(+ ,@ns) (apply + (map (lambda (n)
 				 (eval-expr n env))
 			       ns))]
@@ -73,9 +73,9 @@
       ; [`(< ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply < (cons n1 (cons n2 n-rest)))]
       ; [`(<= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply <= (cons n1 (cons n2 n-rest)))]
       ; [`(= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply = (cons n1 (cons n2 n-rest)))]
-      [`(quotient ,n1 ,n2) (quotient (eval-expr n1 env) (eval-expr n2 env))]
-      [`(remainder ,n1 ,n2) (remainder (eval-expr n1 env) (eval-expr n2 env))]
-      [`(modulo ,n1 ,n2) (modulo (eval-expr n1 env) (eval-expr n2 env))]
+      [`(quotient ,n1-expr ,n2-expr) (quotient (eval-expr n1-expr env) (eval-expr n2-expr env))]
+      [`(remainder ,n1-expr ,n2-expr) (remainder (eval-expr n1-expr env) (eval-expr n2-expr env))]
+      [`(modulo ,n1-expr ,n2-expr) (modulo (eval-expr n1-expr env) (eval-expr n2-expr env))]
 
       ;; Derived expressions
       ;; -------------------
