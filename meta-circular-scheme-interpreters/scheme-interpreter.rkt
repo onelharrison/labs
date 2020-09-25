@@ -56,18 +56,32 @@
       [`(real? ,n) (real? n)]
       [`(rational? ,n) (rational? n)]
       [`(integer? ,n) (integer? n)]
-      [`(+ ,@(list (? number? ns)...)) (apply + ns)]
-      [`(* ,@(list (? number? ns)...)) (apply * ns)]
-      [`(- ,n1 ,@(list (? number? n-rest)...)) (apply - (cons n1 n-rest))]
-      [`(/ ,n1 ,@(list (? number? n-rest)...)) (apply / (cons n1 n-rest))]
-      [`(> ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply > (cons n1 (cons n2 n-rest)))]
-      [`(>= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply >= (cons n1 (cons n2 n-rest)))]
-      [`(< ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply < (cons n1 (cons n2 n-rest)))]
-      [`(<= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply <= (cons n1 (cons n2 n-rest)))]
-      [`(= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply = (cons n1 (cons n2 n-rest)))]
-      [`(quotient ,n1 ,n2) (quotient n1 n2)]
-      [`(remainder ,n1 ,n2) (remainder n1 n2)]
-      [`(modulo ,n1 ,n2) (modulo n1 n2)]
+      [`(+ ,@ns) (apply + (map (lambda (n)
+				 (eval-expr n env))
+			       ns))]
+      [`(* ,@ns) (apply * (map (lambda (n)
+				 (eval-expr n env))
+			       ns))]
+      [`(- ,n1 ,@n-rest) (apply - (cons (eval-expr n1 env)
+					(map (lambda (n)
+					       (eval-expr n env))
+					     n-rest)))]
+      ; TODO: Fix implementation - params could be expressions
+      ; [`(/ ,n1 ,@(list (? number? n-rest)...)) (apply / (cons n1 n-rest))]
+      ; [`(> ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply > (cons n1 (cons n2 n-rest)))]
+      ; [`(>= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply >= (cons n1 (cons n2 n-rest)))]
+      ; [`(< ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply < (cons n1 (cons n2 n-rest)))]
+      ; [`(<= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply <= (cons n1 (cons n2 n-rest)))]
+      ; [`(= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply = (cons n1 (cons n2 n-rest)))]
+      [`(quotient ,n1 ,n2) (quotient (eval-expr n1 env) (eval-expr n2 env))]
+      [`(remainder ,n1 ,n2) (remainder (eval-expr n1 env) (eval-expr n2 env))]
+      [`(modulo ,n1 ,n2) (modulo (eval-expr n1 env) (eval-expr n2 env))]
+
+      ;; Derived expressions
+      ;; -------------------
+      ; Binding constructs
+      [`(let ((,(? symbol? x) ,x-expr)),body)
+	((closure eval-expr x body env) (eval-expr x-expr env))]
 
       ;; variable
       ;; --------

@@ -117,45 +117,45 @@
     (eval-expr '(- 3 2) (empty-env))
     1)
 
-(it "evalutes (> 3 2) to #t"
-    (eval-expr '(> 3 2) (empty-env))
-    #t)
-
-(it "evalutes (> 3 2 1) to #t"
-    (eval-expr '(> 3 2 1) (empty-env))
-    #t)
-
-(it "evalutes (>= 3 2) to #t"
-    (eval-expr '(>= 3 2) (empty-env))
-    #t)
-
-(it "evalutes (>= 2 2 1) to #t"
-    (eval-expr '(>= 2 2 1) (empty-env))
-    #t)
-
-(it "evalutes (< 1 2) to #t"
-    (eval-expr '(< 1 2) (empty-env))
-    #t)
-
-(it "evalutes (< 1 2 3) to #t"
-    (eval-expr '(< 1 2 3) (empty-env))
-    #t)
-
-(it "evalutes (<= 1 2) to #t"
-    (eval-expr '(<= 1 2) (empty-env))
-    #t)
-
-(it "evalutes (<= 1 2 2) to #t"
-    (eval-expr '(<= 1 2 2) (empty-env))
-    #t)
-
-(it "evalutes (= 2 2) to #t"
-    (eval-expr '(= 2 2) (empty-env))
-    #t)
-
-(it "evalutes (= 2 2 2) to #t"
-    (eval-expr '(= 2 2 2) (empty-env))
-    #t)
+; (it "evalutes (> 3 2) to #t"
+;     (eval-expr '(> 3 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (> 3 2 1) to #t"
+;     (eval-expr '(> 3 2 1) (empty-env))
+;     #t)
+;
+; (it "evalutes (>= 3 2) to #t"
+;     (eval-expr '(>= 3 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (>= 2 2 1) to #t"
+;     (eval-expr '(>= 2 2 1) (empty-env))
+;     #t)
+;
+; (it "evalutes (< 1 2) to #t"
+;     (eval-expr '(< 1 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (< 1 2 3) to #t"
+;     (eval-expr '(< 1 2 3) (empty-env))
+;     #t)
+;
+; (it "evalutes (<= 1 2) to #t"
+;     (eval-expr '(<= 1 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (<= 1 2 2) to #t"
+;     (eval-expr '(<= 1 2 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (= 2 2) to #t"
+;     (eval-expr '(= 2 2) (empty-env))
+;     #t)
+;
+; (it "evalutes (= 2 2 2) to #t"
+;     (eval-expr '(= 2 2 2) (empty-env))
+;     #t)
 
 (it "evalutes (quotient 10 3) to 3"
     (eval-expr '(quotient 10 3) (empty-env))
@@ -168,3 +168,19 @@
 (it "evalutes (modulo 10 3) to 1"
     (eval-expr '(modulo 10 3) (empty-env))
     1)
+
+(it "evaluate (let ((x 10)) (+ 10 x)) to 20"
+    (eval-expr '(let ((x 10)) (+ 10 x)) (empty-env))
+    20)
+
+(it "evaluate (let ((x 10)) (let ((y 20)) (+ x y))) to 30"
+    (eval-expr '(let ((x 10))
+		  (let ((y 20))
+		    (+ x y))) (empty-env))
+    30)
+
+(it "evaluate (let ((x 10)) (let ((y (+ 3 4))) (+ x y))) to 17"
+    (eval-expr '(let ((x 10))
+		  (let ((y (+ 3 4)))
+		    (+ x y))) (empty-env))
+    17)
