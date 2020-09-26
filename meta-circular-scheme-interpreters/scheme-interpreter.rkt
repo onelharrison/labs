@@ -56,23 +56,28 @@
       [`(real? ,n-expr) (real? (eval-expr n-expr env))]
       [`(rational? ,n-expr) (rational? (eval-expr n-expr env))]
       [`(integer? ,n-expr) (integer? (eval-expr n-expr env))]
-      [`(+ ,@ns) (apply + (map (lambda (n)
-				 (eval-expr n env))
-			       ns))]
-      [`(* ,@ns) (apply * (map (lambda (n)
-				 (eval-expr n env))
-			       ns))]
-      [`(- ,n1 ,@n-rest) (apply - (cons (eval-expr n1 env)
-					(map (lambda (n)
-					       (eval-expr n env))
-					     n-rest)))]
+      [`(+ ,@n-exprs) (apply + (map (lambda (n-expr)
+				 (eval-expr n-expr env))
+			       n-exprs))]
+      [`(* ,@n-exprs) (apply * (map (lambda (n-expr)
+				 (eval-expr n-expr env))
+			       n-exprs))]
+      [`(- ,n1-expr ,@n-rest-exprs) (apply - (cons (eval-expr n1-expr env)
+					(map (lambda (n-expr)
+					       (eval-expr n-expr env))
+					     n-rest-exprs)))]
       ; TODO: Fix implementation - params could be expressions
       ; [`(/ ,n1 ,@(list (? number? n-rest)...)) (apply / (cons n1 n-rest))]
       ; [`(> ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply > (cons n1 (cons n2 n-rest)))]
       ; [`(>= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply >= (cons n1 (cons n2 n-rest)))]
       ; [`(< ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply < (cons n1 (cons n2 n-rest)))]
       ; [`(<= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply <= (cons n1 (cons n2 n-rest)))]
-      ; [`(= ,n1 ,n2 ,@(list (? number? n-rest)...)) (apply = (cons n1 (cons n2 n-rest)))]
+      [`(= ,n1-expr ,n2-expr ,@ns-rest-exprs)
+	(apply = (cons (eval-expr n1-expr env)
+		       (cons (eval-expr n2-expr env)
+			     (map (lambda (n)
+				    (eval-expr n env)) ns-rest-exprs))))]
+
       [`(quotient ,n1-expr ,n2-expr) (quotient (eval-expr n1-expr env) (eval-expr n2-expr env))]
       [`(remainder ,n1-expr ,n2-expr) (remainder (eval-expr n1-expr env) (eval-expr n2-expr env))]
       [`(modulo ,n1-expr ,n2-expr) (modulo (eval-expr n1-expr env) (eval-expr n2-expr env))]
@@ -81,13 +86,19 @@
       ;; -------------------
       ; Binding constructs
       [`(let ((,(? symbol? x) ,x-expr)),body)
-	((closure eval-expr x body env) (eval-expr x-expr env))]
+	((closure x body env) (eval-expr x-expr env))]
 
-      ;; variable
+      [`(letrec ((,(? symbol? x1) ,x1-expr)
+	         (,(? symbol? x2) ,x2-expr)) ,body)
+          (eval-expr
+	    body
+	    (env-extend-letrec `((,x1 . ,x1-expr) (,x2 . ,x2-expr)) env))]
+
+      ;; Variable
       ;; --------
       [`,(? symbol? x) (env-lookup x env)]
 
-      ;; literals
+      ;; Literals
       ;; --------
       [`',datum `,datum]
       [`(quote ,datum) `,datum]
@@ -95,16 +106,16 @@
       ['#f #f]
       [`,(? number? n) n]
 
-      ;; lambda expression
+      ;; Lambda expression
       ;; -----------------
-      [`(lambda (,(? symbol? x)) ,body) (closure eval-expr x body env)]
+      [`(lambda (,(? symbol? x)) ,body) (closure x body env)]
 
-      ;; procedure call
+      ;; Procedure call
       ;; --------------
       [`(,operator ,operand)
 	((eval-expr operator env) (eval-expr operand env))]
 
-      ;; conditionals
+      ;; Conditionals
       ;; ------------
       [`(if ,test-expr ,consequent-expr ,alternate-expr)
 	(if (eval-expr test-expr env)
@@ -120,13 +131,21 @@
     (match env
       [`(empty-env) (error 'env-lookup "unbound variable ~s" var)]
       [`(ext ,var^ ,val . ,env-rest)
-	(if (eq? var var^) val (env-lookup var env-rest))])))
+	(if (eq? var var^) val (env-lookup var env-rest))]
+      [`(letrec ,bindings . ,env-rest)
+	(match (assq var bindings)
+	  [`(,var^ . ,val) (eval-expr val env)]
+	  [#f (env-lookup var env-rest)])])))
 
 (define env-extend
   (lambda (var arg env)
    `(ext ,var ,arg . ,env)))
 
+(define env-extend-letrec
+  (lambda (bindings env)
+    `(letrec ,bindings . ,env)))
+
 (define closure
-  (lambda (evaluator var body env)
+  (lambda (var body env)
     (lambda (arg)
-      (evaluator body (env-extend var arg env)))))
+      (eval-expr body (env-extend var arg env)))))

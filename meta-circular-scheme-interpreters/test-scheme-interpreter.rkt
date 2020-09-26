@@ -149,13 +149,13 @@
 ;     (eval-expr '(<= 1 2 2) (empty-env))
 ;     #t)
 ;
-; (it "evalutes (= 2 2) to #t"
-;     (eval-expr '(= 2 2) (empty-env))
-;     #t)
-;
-; (it "evalutes (= 2 2 2) to #t"
-;     (eval-expr '(= 2 2 2) (empty-env))
-;     #t)
+(it "evalutes (= 2 2) to #t"
+    (eval-expr '(= 2 2) (empty-env))
+    #t)
+
+(it "evalutes (= 2 2 2) to #t"
+    (eval-expr '(= 2 2 2) (empty-env))
+    #t)
 
 (it "evalutes (quotient 10 3) to 3"
     (eval-expr '(quotient 10 3) (empty-env))
@@ -184,3 +184,55 @@
 		  (let ((y (+ 3 4)))
 		    (+ x y))) (empty-env))
     17)
+
+(it "evaluates a mutually recursive letrec expression correctly (is-even? positive case)"
+    (eval-expr '(letrec ((is-odd? (lambda (x)
+				(if (= x 0)
+				  #f
+				  (is-even? (- x 1)))))
+		     (is-even? (lambda (x)
+				 (if (= x 0)
+				   #t
+				   (is-odd? (- x 1))))))
+	      (is-even? 50))
+	   (empty-env))
+    #t)
+
+(it "evaluates a mutually recursive letrec expression correctly (is-even? negative case)"
+    (eval-expr '(letrec ((is-odd? (lambda (x)
+				(if (= x 0)
+				  #f
+				  (is-even? (- x 1)))))
+		     (is-even? (lambda (x)
+				 (if (= x 0)
+				   #t
+				   (is-odd? (- x 1))))))
+	      (is-even? 23))
+	   (empty-env))
+    #f)
+
+(it "evaluates a mutually recursive letrec expression correctly (is-odd? positive case)"
+    (eval-expr '(letrec ((is-odd? (lambda (x)
+				(if (= x 0)
+				  #f
+				  (is-even? (- x 1)))))
+		     (is-even? (lambda (x)
+				 (if (= x 0)
+				   #t
+				   (is-odd? (- x 1))))))
+	      (is-odd? 23))
+	   (empty-env))
+    #t)
+
+(it "evaluates a mutually recursive letrec expression correctly (is-odd? negative case)"
+    (eval-expr '(letrec ((is-odd? (lambda (x)
+				(if (= x 0)
+				  #f
+				  (is-even? (- x 1)))))
+		     (is-even? (lambda (x)
+				 (if (= x 0)
+				   #t
+				   (is-odd? (- x 1))))))
+	      (is-odd? 22))
+	   (empty-env))
+    #f)
