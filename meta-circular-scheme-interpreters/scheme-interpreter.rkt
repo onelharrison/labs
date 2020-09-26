@@ -85,8 +85,14 @@
       ;; Derived expressions
       ;; -------------------
       ; Binding constructs
-      [`(let ((,(? symbol? x) ,x-expr)),body)
+      [`(let ((,(? symbol? x) ,x-expr)) ,body)
 	((closure x body env) (eval-expr x-expr env))]
+
+      ; TODO: Refactor and add tests
+      [`(let* ((,(? symbol? x1) ,x1-expr)
+	       (,(? symbol? x2) ,x2-expr)) ,body)
+	(eval-expr body (env-extend x2 (eval-expr x2-expr (env-extend x1 (eval-expr x1-expr env) env))
+				       (env-extend x1 (eval-expr x1-expr env) env)))]
 
       [`(letrec ((,(? symbol? x1) ,x1-expr)
 	         (,(? symbol? x2) ,x2-expr)) ,body)
@@ -149,3 +155,6 @@
   (lambda (var body env)
     (lambda (arg)
       (eval-expr body (env-extend var arg env)))))
+
+; TODO: Remove after adding tests
+(eval-expr '(let* ((x 1) (y x)) (+ x y)) (empty-env))
