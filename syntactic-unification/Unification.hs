@@ -29,7 +29,7 @@ unify (UList (x:xs)) (UList (y:ys)) s =
   case unify x y s of
     Just s' -> unify (UList xs) (UList ys) s'
     Nothing -> Nothing
-unify (UList _) (UList _) s = Nothing
+unify (UList _) (UList _) _ = Nothing
 unify a b s
   | a == b = Just s
   | otherwise = Nothing
