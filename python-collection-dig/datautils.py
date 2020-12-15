@@ -12,9 +12,9 @@ from typing import (
 )
 
 
-def coalesce(*values: Optional[Any], default: Optional[Any] = None) -> Optional[Any]:
-    """Return the first non-None value"""
-    return next((v for v in values if v is not None), default)
+def coalesce(*values: Optional[Any]) -> Optional[Any]:
+    """Return the first non-None value or None if all values are None"""
+    return next((v for v in values if v is not None), None)
 
 
 def safe_cast(
