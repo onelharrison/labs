@@ -1,13 +1,18 @@
 """A collection of functions for safely working with dirty data"""
 
 from functools import reduce
-from typing import (Any, Callable, Collection, Hashable, Iterable,
-                    Mapping, Optional, Sequence, Union, overload)
+from typing import (
+    Any,
+    Callable,
+    Hashable,
+    Mapping,
+    Optional,
+    Sequence,
+    overload,
+)
 
 
-def coalesce(
-    *values: Iterable[Optional[Any]], default: Optional[Any] = None
-) -> Optional[Any]:
+def coalesce(*values: Optional[Any], default: Optional[Any] = None) -> Optional[Any]:
     """Return the first non-None value"""
     return next((v for v in values if v is not None), default)
 
@@ -34,7 +39,7 @@ def safe_get(collection: Sequence, key: int, default: Optional[Any] = None):
     pass
 
 
-def safe_get(collection, key, default = None):
+def safe_get(collection, key, default=None):
     """Get values from a collection without raising errors"""
     # pylint:disable=isinstance-second-argument-not-valid-type
 
@@ -50,10 +55,16 @@ def safe_get(collection, key, default = None):
     return default
 
 
-def dig(
-    collection: Collection,
-    *keys: Union[int, Hashable],
-    default: Optional[Any] = None
-) -> Optional[Any]:
+@overload
+def dig(collection: Sequence, *keys: int, default: Optional[Any] = None):
+    pass
+
+
+@overload
+def dig(collection: Mapping, *keys: Hashable, default: Optional[Any] = None):
+    pass
+
+
+def dig(collection, *keys, default=None):
     """Get values from a potentially nested collection without raising errors"""
     return reduce(lambda x, y: safe_get(x, y, default), keys, collection)
