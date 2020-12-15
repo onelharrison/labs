@@ -1,7 +1,7 @@
 """A collection of functions for safely working with dirty data"""
 
 from functools import reduce
-from typing import (Any, Callable, Collection, Hashable, Iterable, List,
+from typing import (Any, Callable, Collection, Hashable, Iterable,
                     Mapping, Optional, Sequence, Union, overload)
 
 
@@ -52,8 +52,8 @@ def safe_get(collection, key, default = None):
 
 def dig(
     collection: Collection,
-    *keys: List[Union[int, Hashable]],
+    *keys: Union[int, Hashable],
     default: Optional[Any] = None
 ) -> Optional[Any]:
     """Get values from a potentially nested collection without raising errors"""
-    return reduce(lambda x, y: safe_get(x, y, default), keys, collection)  # type: ignore
+    return reduce(lambda x, y: safe_get(x, y, default), keys, collection)
