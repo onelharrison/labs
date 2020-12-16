@@ -1,15 +1,8 @@
 """A collection of functions for safely working with dirty data"""
 
 from functools import reduce
-from typing import (
-    Any,
-    Callable,
-    Hashable,
-    Mapping,
-    Optional,
-    Sequence,
-    overload,
-)
+from typing import (Any, Callable, Hashable, Mapping, Optional, Sequence,
+                    overload)
 
 
 def coalesce(*values: Optional[Any]) -> Optional[Any]:
@@ -41,16 +34,16 @@ def safe_get(collection: Sequence, key: int, default: Optional[Any] = None):
 
 def safe_get(collection, key, default=None):
     """Get values from a collection without raising errors"""
-    # pylint:disable=isinstance-second-argument-not-valid-type
 
-    if isinstance(collection, Mapping):
+    try:
         return collection.get(key, default)
+    except TypeError:
+        pass
 
-    if isinstance(collection, Sequence):
-        try:
-            return collection[key]
-        except (IndexError, TypeError):
-            pass
+    try:
+        return collection[key]
+    except (IndexError, TypeError):
+        pass
 
     return default
 
