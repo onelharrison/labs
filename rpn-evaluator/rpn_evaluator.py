@@ -13,12 +13,12 @@ Number = Union[int, float]
 
 
 def tokenize(expr: str) -> List[str]:
-    """Parses expression `expr` into a list of tokens"""
+    """Breaks expression `expr` into a list of tokens"""
     return expr.split(" ")
 
 
-def popn(stack: List[Any], n: int = 1) -> List[Any]:
-    """Pops and returns `n` items from a stack"""
+def mpop(stack: List[Any], n: int = 1) -> List[Any]:
+    """Pops and returns `n` items from a stack. Mutates `stack`"""
     return [stack.pop() for _ in range(n)]
 
 
@@ -28,30 +28,28 @@ def to_num(x: Any) -> Number:
     return int(n) if n.is_integer() else n
 
 
-def consume_token(token: str, stack: List[Number]):
+def consume_token(token: str, stack: List[Number]) -> List[Number]:
     """Consumes a token given the current stack and returns the updated stack"""
     if token in supported_operators:
         try:
-            num1, num2 = popn(stack, 2)
+            num1, num2 = mpop(stack, 2)
         except IndexError:
             logging.error("SyntaxError: Malformed expression")
             sys.exit(1)
 
         result = supported_operators[token](num2, num1)
-        stack.append(result)
+        return [*stack, result]
     else:
         try:
-            stack.append(to_num(token))
+            return [*stack, to_num(token)]
         except ValueError:
             logging.error("SyntaxError: Unsupported token '%s'", token)
             sys.exit(1)
 
-    return stack
-
 
 def get_result_from_stack(stack: List[Number]) -> Number:
     """Gets the result from `stack`"""
-    result, *rest = popn(stack, 1)
+    result, *rest = mpop(stack, 1)
     if rest:
         logging.error("SyntaxError: Found extra tokens")
         sys.exit(1)
