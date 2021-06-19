@@ -3,11 +3,13 @@
 import logging
 import operator as op
 import sys
-from typing import List
+from typing import Any, List, Union
 
-logging.getLogger().setLevel("INFO")
+logging.getLogger(__name__).setLevel("INFO")
 
 supported_operators = {"+": op.add, "-": op.sub, "*": op.mul, "/": op.truediv}
+
+Number = Union[int, float]
 
 
 def tokenize(expr: str) -> List[str]:
@@ -15,69 +17,65 @@ def tokenize(expr: str) -> List[str]:
     return expr.split(" ")
 
 
-def to_num(x):
-    x = float(x)
-    return int(x) if x.is_integer() else x
+def popn(stack: List[Any], n: int = 1) -> List[Any]:
+    """Pops and returns `n` items from a stack"""
+    return [stack.pop() for _ in range(n)]
 
 
-def evaluate_v1(tokens: List[str]):
-    """Evaluates a tokenized expression and returns the result"""
-    stack: List = []
+def to_num(x: Any) -> Number:
+    """Converts a value to a its appropriate numeric type"""
+    n = float(x)
+    return int(n) if n.is_integer() else n
 
-    for token in tokens:
-        if token in supported_operators:
-            try:
-                num1 = stack.pop()
-                num2 = stack.pop()
-            except IndexError:
-                logging.error(f"SyntaxError: Malformed expression")
-                sys.exit(1)
 
-            result = supported_operators[token](num2, num1)
-            stack.append(result)
-        else:
-            try:
-                stack.append(to_num(token))
-            except ValueError:
-                logging.error(f"SyntaxError: Unsupported token '{token}'")
-                sys.exit(1)
+def consume_token(token: str, stack: List[Number]):
+    """Consumes a token given the current stack and returns the updated stack"""
+    if token in supported_operators:
+        try:
+            num1, num2 = popn(stack, 2)
+        except IndexError:
+            logging.error("SyntaxError: Malformed expression")
+            sys.exit(1)
 
-    result = stack.pop()
-    if stack:
-        logging.error(f"SyntaxError: Found extra tokens")
+        result = supported_operators[token](num2, num1)
+        stack.append(result)
+    else:
+        try:
+            stack.append(to_num(token))
+        except ValueError:
+            logging.error("SyntaxError: Unsupported token '%s'", token)
+            sys.exit(1)
+
+    return stack
+
+
+def get_result_from_stack(stack: List[Number]) -> Number:
+    """Gets the result from `stack`"""
+    result, *rest = popn(stack, 1)
+    if rest:
+        logging.error("SyntaxError: Found extra tokens")
         sys.exit(1)
     return result
 
 
-def evaluate_v2(tokens: List[str]):
+def evaluate_v1(tokens: List[str]) -> Number:
+    """Evaluates a tokenized expression and returns the result"""
+    stack: List = []
+
+    for token in tokens:
+        stack = consume_token(token, stack)
+
+    return get_result_from_stack(stack)
+
+
+def evaluate_v2(tokens: List[str]) -> Number:
     """Evaluates a tokenized expression and returns the result"""
 
-    def _evaluate(tokens: List[str], stack: List):
+    def _evaluate(tokens: List[str], stack: List) -> Number:
         if not tokens:
-            result = stack.pop()
-            if stack:
-                logging.error(f"SyntaxError: Found extra tokens")
-                sys.exit(1)
-            return result
+            return get_result_from_stack(stack)
 
-        token = tokens[0]
-
-        if token in supported_operators:
-            try:
-                num1 = stack.pop()
-                num2 = stack.pop()
-            except IndexError:
-                logging.error(f"SyntaxError: Malformed expression")
-                sys.exit(1)
-
-            result = supported_operators[token](num2, num1)
-            stack.append(result)
-        else:
-            try:
-                stack.append(to_num(token))
-            except ValueError:
-                logging.error(f"SyntaxError: Unsupported token '{token}'")
-                sys.exit(1)
+        stack = consume_token(tokens[0], stack)
 
         return _evaluate(tokens[1:], stack)
 
