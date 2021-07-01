@@ -35,7 +35,7 @@ with io.StringIO() as csv_buffer:
         Bucket=AWS_S3_BUCKET, Key="files/books.csv", Body=csv_buffer.getvalue()
     )
 
-    status = response.get("ResponseMetada", {}).get("HTTPStatusCode")
+    status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
     if status == 200:
         print(f"Successful S3 put_object response. Status - {status}")

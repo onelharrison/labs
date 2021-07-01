@@ -23,7 +23,7 @@ s3_client = boto3.client(
 
 response = s3_client.get_object(Bucket=AWS_S3_BUCKET, Key="files/books.csv")
 
-status = response.get("ResponseMetada", {}).get("HTTPStatusCode")
+status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
 if status == 200:
     print(f"Successful S3 get_object response. Status - {status}")
