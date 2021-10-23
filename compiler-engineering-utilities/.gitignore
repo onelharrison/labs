@@ -1,0 +1,7 @@
+*.gv
+*.svg
+
+*.ir
+
+__pycache__/
+*.pyc
